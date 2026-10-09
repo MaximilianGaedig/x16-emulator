@@ -307,6 +307,7 @@ via1_write(uint8_t reg, uint8_t value)
 		const uint8_t pa = via[0].registers[1] | ~via[0].registers[3];
 		i2c_port.data_in = pa & I2C_DATA_MASK;										//Sets data_in = 1 if the corresponding DDR bit is 0 (input), simulates a pull-up
 		i2c_port.clk_in = (pa & I2C_CLK_MASK) >> 1;									//Sets clk_in = 1 if pin is an input, simulates a pull-up
+		i2c_step();																	//React to the new pin state right away
 		joystick_set_latch(via[0].registers[1] & JOY_LATCH_MASK);
 		joystick_set_clock(via[0].registers[1] & JOY_CLK_MASK);
 	}

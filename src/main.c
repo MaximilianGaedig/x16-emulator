@@ -1742,9 +1742,8 @@ emulator_loop(void *param)
 			new_frame |= video_step(MHZ, clocks, false);
 		}
 
-		for (uint32_t i = 0; i < clocks; i++) {
-			i2c_step();
-		}
+		// No i2c_step() here: the bus only changes on VIA port
+		// accesses, and via1_write() steps it as soon as the pins change.
 		rtc_step(clocks);
 
 		if (!headless) {
