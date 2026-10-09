@@ -77,6 +77,7 @@ extern uint8_t *fsroot_path;
 extern uint8_t *startin_path;
 extern uint8_t keymap;
 extern bool warp_mode;
+extern bool render_thread;
 extern uint32_t bench_frames;
 extern bool grab_mouse;
 extern bool testbench;

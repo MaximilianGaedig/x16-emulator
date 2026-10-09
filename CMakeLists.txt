@@ -175,6 +175,7 @@ set(X16_SOURCES
     src/memory.c
     src/disasm.c
     src/video.c
+    src/video_render.c
     src/i2c.c
     src/smc.c
     src/rtc.c
