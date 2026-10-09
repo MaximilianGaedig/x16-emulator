@@ -27,7 +27,7 @@ timing_init() {
 	cpu_ticks = 0;
 }
 
-void
+bool
 timing_update()
 {
 	frames++;
@@ -35,7 +35,7 @@ timing_update()
 	clockticks6502_old = clockticks6502;
 	uint32_t sdlTicks = SDL_GetTicks() - sdlTicks_base;
 	int64_t diff_time = cpu_ticks / MHZ - sdlTicks * 1000LL;
-	if (!warp_mode && diff_time > 0) {
+	if (!warp_mode && !bench_frames && diff_time > 0) {
 		if (diff_time >= 1000000) {
 			sleep(diff_time / 1000000);
 			diff_time %= 1000000;
@@ -58,6 +58,13 @@ timing_update()
 		last_perf_update = sdlTicks;
 	}
 
+	if (bench_frames && frames >= bench_frames) {
+		double secs = sdlTicks / 1000.0;
+		printf("bench: %u frames in %.3f s = %.1f fps, %.2f MHz emulated (%.0f%% of %d MHz)\n",
+			frames, secs, frames / secs, cpu_ticks / secs / 1e6, cpu_ticks / secs / 1e4 / MHZ, MHZ);
+		return false;
+	}
+
 	if (log_speed) {
 		float frames_behind = -((float)diff_time * 6e-5);
 		int load = (int)((1 + frames_behind) * 100);
@@ -68,5 +75,6 @@ timing_update()
 		} else {
 		}
 	}
-}
 
+	return true;
+}

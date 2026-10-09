@@ -106,6 +106,7 @@ bool dump_ram = true;
 bool dump_bank = true;
 bool dump_vram = false;
 bool warp_mode = false;
+uint32_t bench_frames = 0;
 bool warp_pastes = false;
 bool grab_mouse = false;
 echo_mode_t echo_mode;
@@ -446,6 +447,9 @@ usage()
 	printf("\tStart the -prg/-bas program using RUN\n");
 	printf("-warp\n");
 	printf("\tEnable warp mode, run emulator as fast as possible.\n");
+	printf("-bench <frames>\n");
+	printf("\tRun unthrottled, rendering every frame, and exit after\n");
+	printf("\t<frames> frames, printing the achieved speed.\n");
 	printf("-pastewarp\n");
 	printf("\tEnable warp mode during pastes and during loading via -bas.\n");
 	printf("-echo [{iso|raw}]\n");
@@ -779,6 +783,15 @@ main(int argc, char **argv)
 			argc--;
 			argv++;
 			warp_mode = true;
+		} else if (!strcmp(argv[0], "-bench")) {
+			argc--;
+			argv++;
+			if (!argc || argv[0][0] == '-') {
+				usage();
+			}
+			bench_frames = atoi(argv[0]);
+			argc--;
+			argv++;
 		} else if (!strcmp(argv[0], "-pastewarp")) {
 			argc--;
 			argv++;
@@ -1754,7 +1767,9 @@ emulator_loop(void *param)
 				break;
 			}
 
-			timing_update();
+			if (!timing_update()) {
+				break;
+			}
 #ifdef __EMSCRIPTEN__
 			// After completing a frame we yield back control to the browser to stay responsive
 			return 0;
